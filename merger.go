@@ -75,7 +75,7 @@ func mergeStepStruct(dst, src reflect.Value, overwrite bool) error {
 					if dstval.Kind() == srcval.Kind() {
 						if isEmptyValue(dstval) || overwrite {
 							// copy
-							if dstval.CanSet() {
+							if dstval.CanSet() && dstval.Type() == srcval.Type() {
 								dstval.Set(srcval)
 							}
 							//TODO: recursive struct/map set
@@ -86,7 +86,7 @@ func mergeStepStruct(dst, src reflect.Value, overwrite bool) error {
 					if dstval.Kind() == srcval.Kind() {
 						if isEmptyValue(dstval) || overwrite {
 							// copy
-							if dstval.CanSet() {
+							if dstval.CanSet() && dstval.Type() == srcval.Type() {
 								dstval.Set(srcval)
 							} else {
 								log.Println("CANNOT SET", srckey.String(), dstval.Interface(), dstval.CanAddr())
@@ -105,7 +105,7 @@ func mergeStepStruct(dst, src reflect.Value, overwrite bool) error {
 			if dstval, ok := fieldNames[srcType.Field(i).Name]; ok {
 				srcval := src.Field(i)
 				if dstval.Kind() == srcval.Kind() {
-					if dstval.CanSet() {
+					if dstval.CanSet() && dstval.Type() == srcval.Type() {
 						dstval.Set(srcval)
 					}
 				}
