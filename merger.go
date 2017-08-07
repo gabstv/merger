@@ -11,6 +11,10 @@ func Merge(dst, src interface{}) error {
 	return merge(dst, src, false)
 }
 
+func MergeOverwrite(dst, src interface{}) error {
+	return merge(dst, src, true)
+}
+
 func merge(dst, src interface{}, overwrite bool) error {
 	if dst == nil {
 		return fmt.Errorf("dst cannot be nil")
