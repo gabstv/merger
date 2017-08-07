@@ -53,3 +53,23 @@ func TestComplex(t *testing.T) {
 	assert.Equal(t, "Doe", a.Person.Name)
 	assert.Equal(t, 10, a.Cars)
 }
+
+func TestMap(t *testing.T) {
+	a := make(map[string]interface{})
+	a["t"] = 1
+	b := struct {
+		A          string `json:"t"`
+		B          float64
+		unexported int
+	}{
+		"test",
+		10.2,
+		1,
+	}
+	err := merge(&a, b, true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Equal(t, "test", a["t"])
+	assert.Equal(t, float64(10.2), a["B"])
+}

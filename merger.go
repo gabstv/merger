@@ -47,7 +47,7 @@ func mergeStep(dst, src reflect.Value, overwrite bool) error {
 	if dst.Kind() == reflect.Struct {
 		return mergeStepStruct(dst, src, overwrite)
 	}
-	return fmt.Errorf("not implemented")
+	return mergeStepMap(dst, src, overwrite)
 }
 
 func mergeStepStruct(dst, src reflect.Value, overwrite bool) error {
@@ -57,11 +57,13 @@ func mergeStepStruct(dst, src reflect.Value, overwrite bool) error {
 	dstType := dst.Type()
 	for i := 0; i < n; i++ {
 		sfield := dstType.Field(i)
-		fieldNames[sfield.Name] = dst.Field(i)
-		if tt, ok := sfield.Tag.Lookup("json"); ok {
-			parts := strings.Split(tt, ",")
-			if strings.TrimSpace(parts[0]) != "-" {
-				fieldJSONNames[strings.TrimSpace(parts[0])] = dst.Field(i)
+		if sfield.Name[0] >= 'A' && sfield.Name[0] <= 'Z' {
+			fieldNames[sfield.Name] = dst.Field(i)
+			if tt, ok := sfield.Tag.Lookup("json"); ok {
+				parts := strings.Split(tt, ",")
+				if strings.TrimSpace(parts[0]) != "-" {
+					fieldJSONNames[strings.TrimSpace(parts[0])] = dst.Field(i)
+				}
 			}
 		}
 	}
@@ -108,6 +110,45 @@ func mergeStepStruct(dst, src reflect.Value, overwrite bool) error {
 					if dstval.CanSet() && dstval.Type() == srcval.Type() {
 						dstval.Set(srcval)
 					}
+				}
+			}
+		}
+	}
+	return nil
+}
+
+func mergeStepMap(dst, src reflect.Value, overwrite bool) error {
+	if src.Kind() == reflect.Map {
+		srckeys := src.MapKeys()
+		for _, v := range srckeys {
+			dv := dst.MapIndex(v)
+			if !dv.IsValid() || (dv.IsValid() && overwrite) {
+				// set
+				dst.SetMapIndex(v, src.MapIndex(v))
+			}
+		}
+		return nil
+	}
+	// src is struct
+	n := src.NumField()
+	srcType := src.Type()
+	for i := 0; i < n; i++ {
+		sfield := srcType.Field(i)
+		if jt, ok := sfield.Tag.Lookup("json"); ok {
+			parts := strings.Split(jt, ",")
+			if part0 := strings.TrimSpace(parts[0]); part0 != "-" {
+				dv := dst.MapIndex(reflect.ValueOf(part0))
+				if !dv.IsValid() || (dv.IsValid() && overwrite) {
+					dst.SetMapIndex(reflect.ValueOf(part0), src.Field(i))
+				}
+			}
+		} else {
+			vv := sfield.Name
+			// don't try to import unexported fields
+			if vv[0] >= 'A' && vv[0] <= 'Z' {
+				dv := dst.MapIndex(reflect.ValueOf(vv))
+				if !dv.IsValid() || (dv.IsValid() && overwrite) {
+					dst.SetMapIndex(reflect.ValueOf(vv), src.Field(i))
 				}
 			}
 		}
