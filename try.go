@@ -54,6 +54,11 @@ func _mNumericInt(dstval reflect.Value, srcval reflect.Value) bool {
 		ii0 := srcval.Int()
 		dstval.SetInt(ii0)
 		return true
+	case reflect.Float32, reflect.Float64:
+		ff0 := srcval.Float()
+		ii0 := int64(ff0)
+		dstval.SetInt(ii0)
+		return true
 	}
 	return false
 }

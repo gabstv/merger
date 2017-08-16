@@ -83,7 +83,7 @@ func TestTime(t *testing.T) {
 	a := make(map[string]interface{})
 	a["t"] = "2015-01-01T18:39:18.379414425-03:00"
 	a["r"] = int64(100)
-	a["r2"] = int32(100)
+	a["r2"] = float64(100)
 	b := struct {
 		T  time.Time `json:"t"`
 		R  int64     `json:"r"`
