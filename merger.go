@@ -96,7 +96,7 @@ func mergeStepStruct(dst, src reflect.Value, overwrite bool) error {
 							//TODO: recursive struct/map set
 						}
 					} else if dstval.CanSet() {
-						tryMergeTimeString(dstval, srcval)
+						tryMergeAll(dstval, srcval)
 					}
 				} else if dstval, ok := fieldJSONNames[srckey.String()]; ok {
 					srcval := src.MapIndex(srckey)
@@ -118,7 +118,7 @@ func mergeStepStruct(dst, src reflect.Value, overwrite bool) error {
 							//TODO: recursive struct/map set
 						}
 					} else if dstval.CanSet() {
-						tryMergeTimeString(dstval, srcval)
+						tryMergeAll(dstval, srcval)
 					}
 				}
 			}
