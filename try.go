@@ -59,6 +59,11 @@ func _mNumericInt(dstval reflect.Value, srcval reflect.Value) bool {
 		ii0 := int64(ff0)
 		dstval.SetInt(ii0)
 		return true
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
+		ui0 := srcval.Uint()
+		ii0 := int64(ui0)
+		dstval.SetInt(ii0)
+		return true
 	}
 	return false
 }
