@@ -1,7 +1,10 @@
 package merger
 
 import (
+	"bytes"
+	"log"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -72,4 +75,19 @@ func TestMap(t *testing.T) {
 	}
 	assert.Equal(t, "test", a["t"])
 	assert.Equal(t, float64(10.2), a["B"])
+}
+
+func TestTime(t *testing.T) {
+	bff := new(bytes.Buffer)
+	log.SetOutput(bff)
+	a := make(map[string]interface{})
+	a["t"] = "2015-01-01T18:39:18.379414425-03:00"
+	b := struct {
+		T time.Time `json:"t"`
+	}{}
+	err := merge(&b, a, true)
+	assert.NoError(t, err)
+	t.Log(bff.String())
+	assert.Equal(t, 2015, b.T.Year())
+
 }
