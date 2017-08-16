@@ -15,7 +15,7 @@ func tryMergeTimeString(dstval reflect.Value, srcval reflect.Value) bool {
 		n--
 	}
 	// try to convert
-	if srcval.Kind() == reflect.String && dstval.Kind() == reflect.Struct {
+	if kk == reflect.String && dstval.Kind() == reflect.Struct {
 		// maybe it's time
 		vvv := dstval.Interface()
 		if _, ok := vvv.(time.Time); ok {

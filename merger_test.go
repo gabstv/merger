@@ -82,12 +82,18 @@ func TestTime(t *testing.T) {
 	log.SetOutput(bff)
 	a := make(map[string]interface{})
 	a["t"] = "2015-01-01T18:39:18.379414425-03:00"
+	a["r"] = int64(100)
+	a["r2"] = int(100)
 	b := struct {
-		T time.Time `json:"t"`
+		T  time.Time `json:"t"`
+		R  int64     `json:"r"`
+		R2 int       `json:"r2"`
 	}{}
 	err := merge(&b, a, true)
 	assert.NoError(t, err)
 	t.Log(bff.String())
 	assert.Equal(t, 2015, b.T.Year())
+	assert.Equal(t, int64(100), b.R)
+	assert.Equal(t, 100, b.R2)
 
 }

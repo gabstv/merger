@@ -78,6 +78,13 @@ func mergeStepStruct(dst, src reflect.Value, overwrite bool) error {
 			for _, srckey := range keys {
 				if dstval, ok := fieldNames[srckey.String()]; ok {
 					srcval := src.MapIndex(srckey)
+					if dstval.Kind() != reflect.Interface && srcval.Kind() == reflect.Interface {
+						n := 10
+						for srcval.Kind() == reflect.Interface && n > 0 {
+							n--
+							srcval = srcval.Elem()
+						}
+					}
 					if dstval.Kind() == srcval.Kind() {
 						if isEmptyValue(dstval) || overwrite {
 							// copy
@@ -93,6 +100,13 @@ func mergeStepStruct(dst, src reflect.Value, overwrite bool) error {
 					}
 				} else if dstval, ok := fieldJSONNames[srckey.String()]; ok {
 					srcval := src.MapIndex(srckey)
+					if dstval.Kind() != reflect.Interface && srcval.Kind() == reflect.Interface {
+						n := 10
+						for srcval.Kind() == reflect.Interface && n > 0 {
+							n--
+							srcval = srcval.Elem()
+						}
+					}
 					if dstval.Kind() == srcval.Kind() {
 						if isEmptyValue(dstval) || overwrite {
 							// copy
