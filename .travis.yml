@@ -14,8 +14,8 @@ git:
 
 go_import_path: github.com/gabstv/merger
 
-#script:
-#  - make something
+script:
+  - go test -race -coverprofile=coverage.txt -covermode=atomic
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
