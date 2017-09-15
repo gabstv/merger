@@ -1,4 +1,9 @@
 # Merger
+
+[![Build Status](https://travis-ci.org/gabstv/merger.svg)](https://travis-ci.org/gabstv/merger)
+[![codecov](https://codecov.io/gh/gabstv/merger/branch/master/graph/badge.svg)](https://codecov.io/gh/gabstv/merger)
+[![GoDoc](https://godoc.org/github.com/gabstv/merger?status.svg)](https://godoc.org/github.com/gabstv/merger)
+
 ```Go
 import(
 	"fmt"
