@@ -44,6 +44,7 @@ func tryMergeNumeric(dstval reflect.Value, srcval reflect.Value) bool {
 	switch dstval.Kind() {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		return _mNumericInt(dstval, srcval)
+		//TODO: floats, uints
 	}
 	return false
 }
@@ -69,7 +70,7 @@ func _mNumericInt(dstval reflect.Value, srcval reflect.Value) bool {
 }
 
 func getRealValue(v reflect.Value) reflect.Value {
-	n := 10
+	n := 25
 	kk := v.Kind()
 	for (kk == reflect.Interface || kk == reflect.Ptr) && n > 0 {
 		v = v.Elem()
