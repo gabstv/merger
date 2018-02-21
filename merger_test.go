@@ -69,7 +69,7 @@ func TestMap(t *testing.T) {
 		10.2,
 		1,
 	}
-	err := merge(&a, b, true)
+	err := merge(&a, b, true, "json")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -90,7 +90,7 @@ func TestMap(t *testing.T) {
 			"e": 100,
 			"f": 2,
 		}
-		assert.NoError(t, merge(&mapa, &mapb, true))
+		assert.NoError(t, merge(&mapa, &mapb, true, "json"))
 		assert.Equal(t, -10, mapa["d"])
 		assert.Equal(t, 100, mapa["e"])
 		assert.Equal(t, 2, mapa["f"])
@@ -109,7 +109,7 @@ func TestTime(t *testing.T) {
 		R  int64     `json:"r"`
 		R2 int       `json:"r2"`
 	}{}
-	err := merge(&b, a, true)
+	err := merge(&b, a, true, "json")
 	assert.NoError(t, err)
 	t.Log(bff.String())
 	assert.Equal(t, 2015, b.T.Year())
@@ -144,14 +144,14 @@ func TestOverwrite(t *testing.T) {
 }
 
 func TestFail(t *testing.T) {
-	assert.EqualError(t, merge(nil, nil, false), "dst cannot be nil")
+	assert.EqualError(t, merge(nil, nil, false, "json"), "dst cannot be nil")
 	m := 1
-	assert.EqualError(t, merge(&m, nil, false), "src cannot be nil")
-	assert.EqualError(t, merge(&m, &m, false), "invalid dst kind int")
+	assert.EqualError(t, merge(&m, nil, false, "json"), "src cannot be nil")
+	assert.EqualError(t, merge(&m, &m, false, "json"), "invalid dst kind int")
 	n := map[string]interface{}{}
-	assert.EqualError(t, merge(n, &m, false), "dst needs to be a pointer")
-	assert.EqualError(t, merge(m, &m, false), "invalid destination kind int")
-	assert.EqualError(t, merge(&n, m, false), "invalid source kind int")
+	assert.EqualError(t, merge(n, &m, false, "json"), "dst needs to be a pointer")
+	assert.EqualError(t, merge(m, &m, false, "json"), "invalid destination kind int")
+	assert.EqualError(t, merge(&n, m, false, "json"), "invalid source kind int")
 }
 
 func TestNumericConversion(t *testing.T) {
@@ -180,4 +180,26 @@ func TestNumericConversion(t *testing.T) {
 		assert.Equal(t, 10, a.A) // should force conversion on map to struct
 		assert.Equal(t, 3, a.B)  // should force conversion on map to struct
 	}
+}
+
+type TestStr string
+
+func TestTag(t *testing.T) {
+	a := struct {
+		ID          int     `db:"id"`
+		Name        TestStr `db:"name"`
+		Description string  `db:"desc"`
+	}{
+		10,
+		"Books",
+		"This is a category",
+	}
+	b := map[string]interface{}{
+		"score": 10,
+	}
+	assert.NoError(t, MergeWithTag(&b, &a, "db"))
+	assert.Equal(t, int(10), b["id"])
+	assert.Equal(t, TestStr("Books"), b["name"])
+	assert.NotEqual(t, "Books", b["name"]) // TestStr is not equal to string
+	assert.Equal(t, "This is a category", b["desc"])
 }
