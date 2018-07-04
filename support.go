@@ -20,5 +20,12 @@ func isEmptyValue(v reflect.Value) bool {
 	case reflect.Interface, reflect.Ptr:
 		return v.IsNil()
 	}
-	return false
+	if !v.IsValid() {
+		return false
+	}
+	ti := v.Interface()
+	if ti == nil {
+		return true
+	}
+	return reflect.DeepEqual(ti, reflect.Zero(reflect.TypeOf(ti)).Interface())
 }

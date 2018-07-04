@@ -171,6 +171,19 @@ func mergeStepMap(dst, src reflect.Value, overwrite bool, tag string) error {
 			if part0 := strings.TrimSpace(parts[0]); part0 != "-" {
 				dv := dst.MapIndex(reflect.ValueOf(part0))
 				if !dv.IsValid() || (dv.IsValid() && overwrite) {
+					// check for omitempty
+					omitempty := false
+					if len(parts) > 1 {
+						for _, v := range parts[1:] {
+							if v == "omitempty" {
+								omitempty = true
+								break
+							}
+						}
+					}
+					if omitempty && isEmptyValue(src.Field(i)) {
+						continue
+					}
 					dst.SetMapIndex(reflect.ValueOf(part0), src.Field(i))
 				}
 			}

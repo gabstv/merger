@@ -33,4 +33,12 @@ func TestEmptyValue(t *testing.T) {
 	var invalid interface{}
 	assert.Equal(t, "invalid", reflect.ValueOf(invalid).Kind().String())
 	assert.Equal(t, false, isEmptyValue(reflect.ValueOf(invalid)))
+
+	// struct
+	type emptyStruct struct {
+		A string
+		B int
+	}
+	emptyst := emptyStruct{}
+	assert.Equal(t, true, isEmptyValue(reflect.ValueOf(emptyst)))
 }

@@ -203,3 +203,20 @@ func TestTag(t *testing.T) {
 	assert.NotEqual(t, "Books", b["name"]) // TestStr is not equal to string
 	assert.Equal(t, "This is a category", b["desc"])
 }
+
+func TestOmitEmpty(t *testing.T) {
+	a := struct {
+		Alpha string `json:"alpha,omitempty"`
+		Beta  string `json:"beta"`
+	}{
+		"",
+		"2",
+	}
+	b := map[string]interface{}{
+		"charlie": "3",
+	}
+	assert.NoError(t, Merge(&b, &a))
+	if _, ok := b["alpha"]; ok {
+		t.Error("beta is present")
+	}
+}
