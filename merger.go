@@ -25,7 +25,8 @@ import (
 //         Name string `json:"name"`
 //     }
 //     type C struct{
-//	       NameWithSameTag string `json:"name"`
+//	       Name string
+//	       Info string
 //     }
 //     func main(){
 //         a := A{Name:"Test A"}
