@@ -1,3 +1,4 @@
+// Package merger provides the ability to merge the content of structs and maps.
 package merger
 
 import (
@@ -7,6 +8,34 @@ import (
 	"strings"
 )
 
+// Merge objects with the default configuration.
+//
+// The default configuration will look for `json` tags and use them for
+// merging members when available. This merge function does not overwrite
+// empty values. For that, use MergeOverwrite.
+//
+// You can merge structs and objects. Example:
+//     package main
+//
+//     import(
+//         "fmt"
+//         "github.com/gabstv/merger"
+//     )
+//     type A struct{
+//         Name string `json:"name"`
+//     }
+//     type C struct{
+//	       NameWithSameTag string `json:"name"`
+//     }
+//     func main(){
+//         a := A{Name:"Test A"}
+//         b := make(map[string]interface{})
+//         c := C{}
+//         merger.Merge(&c, &a)
+//         merger.Merge(&b, &a)
+//         fmt.Println(b["name"])
+//         fmt.Println(c.NameWithSameTag)
+//     }
 func Merge(dst, src interface{}) error {
 	return merge(dst, src, false, "json")
 }
