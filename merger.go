@@ -17,7 +17,7 @@ import (
 // You can merge structs and objects. Example:
 //     package main
 //
-//     import(
+//     import (
 //         "fmt"
 //         "github.com/gabstv/merger"
 //     )
