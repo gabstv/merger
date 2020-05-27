@@ -29,7 +29,6 @@ func toTC(v []TypeConverter) TypeConverters {
 }
 
 func (tc TypeConverters) TrySet(dstval reflect.Value, srcval reflect.Value) bool {
-	println("asdjnasndjanjsdknasnkdknajs")
 	if tc == nil {
 		return false
 	}
