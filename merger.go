@@ -38,22 +38,29 @@ import (
 //         fmt.Println(c.NameWithSameTag)
 //     }
 func Merge(dst, src interface{}) error {
-	return merge(dst, src, false, "json")
+	return merge(dst, src, false, "json", nil)
 }
 
 func MergeWithTag(dst, src interface{}, tag string) error {
-	return merge(dst, src, false, tag)
+	return merge(dst, src, false, tag, nil)
 }
 
 func MergeOverwrite(dst, src interface{}) error {
-	return merge(dst, src, true, "json")
+	return merge(dst, src, true, "json", nil)
 }
 
 func MergeOverwriteWithTag(dst, src interface{}, tag string) error {
-	return merge(dst, src, true, tag)
+	return merge(dst, src, true, tag, nil)
 }
 
-func merge(dst, src interface{}, overwrite bool, tag string) error {
+func MergeWithOptions(dst, src interface{}, tag string, overwrite bool, tc []TypeConverter) error {
+	if tag == "" {
+		tag = "json"
+	}
+	return merge(dst, src, overwrite, tag, tc)
+}
+
+func merge(dst, src interface{}, overwrite bool, tag string, tc []TypeConverter) error {
 	if dst == nil {
 		return fmt.Errorf("dst cannot be nil")
 	}
@@ -75,24 +82,24 @@ func merge(dst, src interface{}, overwrite bool, tag string) error {
 	}
 	switch srcKind {
 	case reflect.Ptr:
-		return merge(dst, reflect.ValueOf(src).Elem().Interface(), overwrite, tag)
+		return merge(dst, reflect.ValueOf(src).Elem().Interface(), overwrite, tag, tc)
 	case reflect.Struct, reflect.Map:
 		// okay
 	default:
 		return fmt.Errorf("invalid source kind %v", srcKind.String())
 	}
-	return mergeStep(reflect.ValueOf(dst).Elem(), reflect.ValueOf(src), overwrite, tag)
+	return mergeStep(reflect.ValueOf(dst).Elem(), reflect.ValueOf(src), overwrite, tag, toTC(tc))
 }
 
-func mergeStep(dst, src reflect.Value, overwrite bool, tag string) error {
+func mergeStep(dst, src reflect.Value, overwrite bool, tag string, tc TypeConverters) error {
 	// get all "keys"
 	if dst.Kind() == reflect.Struct {
-		return mergeStepStruct(dst, src, overwrite, tag)
+		return mergeStepStruct(dst, src, overwrite, tag, tc)
 	}
-	return mergeStepMap(dst, src, overwrite, tag)
+	return mergeStepMap(dst, src, overwrite, tag, tc)
 }
 
-func mergeStepStruct(dst, src reflect.Value, overwrite bool, tag string) error {
+func mergeStepStruct(dst, src reflect.Value, overwrite bool, tag string, tc TypeConverters) error {
 	n := dst.NumField()
 	fieldNames := make(map[string]reflect.Value)
 	fieldJSONNames := make(map[string]reflect.Value)
@@ -134,7 +141,7 @@ func mergeStepStruct(dst, src reflect.Value, overwrite bool, tag string) error {
 							//TODO: recursive struct/map set
 						}
 					} else if dstval.CanSet() {
-						tryMergeAll(dstval, srcval)
+						tryMergeAll(dstval, srcval, tc)
 					}
 				} else if dstval, ok := fieldJSONNames[srckey.String()]; ok {
 					srcval := src.MapIndex(srckey)
@@ -156,7 +163,7 @@ func mergeStepStruct(dst, src reflect.Value, overwrite bool, tag string) error {
 							//TODO: recursive struct/map set
 						}
 					} else if dstval.CanSet() {
-						tryMergeAll(dstval, srcval)
+						tryMergeAll(dstval, srcval, tc)
 					}
 				}
 			}
@@ -179,7 +186,7 @@ func mergeStepStruct(dst, src reflect.Value, overwrite bool, tag string) error {
 	return nil
 }
 
-func mergeStepMap(dst, src reflect.Value, overwrite bool, tag string) error {
+func mergeStepMap(dst, src reflect.Value, overwrite bool, tag string, tc TypeConverters) error {
 	if src.Kind() == reflect.Map {
 		srckeys := src.MapKeys()
 		for _, v := range srckeys {

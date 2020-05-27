@@ -69,7 +69,7 @@ func TestMap(t *testing.T) {
 		10.2,
 		1,
 	}
-	err := merge(&a, b, true, "json")
+	err := merge(&a, b, true, "json", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -90,7 +90,7 @@ func TestMap(t *testing.T) {
 			"e": 100,
 			"f": 2,
 		}
-		assert.NoError(t, merge(&mapa, &mapb, true, "json"))
+		assert.NoError(t, merge(&mapa, &mapb, true, "json", nil))
 		assert.Equal(t, -10, mapa["d"])
 		assert.Equal(t, 100, mapa["e"])
 		assert.Equal(t, 2, mapa["f"])
@@ -109,7 +109,7 @@ func TestTime(t *testing.T) {
 		R  int64     `json:"r"`
 		R2 int       `json:"r2"`
 	}{}
-	err := merge(&b, a, true, "json")
+	err := merge(&b, a, true, "json", nil)
 	assert.NoError(t, err)
 	t.Log(bff.String())
 	assert.Equal(t, 2015, b.T.Year())
@@ -144,14 +144,14 @@ func TestOverwrite(t *testing.T) {
 }
 
 func TestFail(t *testing.T) {
-	assert.EqualError(t, merge(nil, nil, false, "json"), "dst cannot be nil")
+	assert.EqualError(t, merge(nil, nil, false, "json", nil), "dst cannot be nil")
 	m := 1
-	assert.EqualError(t, merge(&m, nil, false, "json"), "src cannot be nil")
-	assert.EqualError(t, merge(&m, &m, false, "json"), "invalid dst kind int")
+	assert.EqualError(t, merge(&m, nil, false, "json", nil), "src cannot be nil")
+	assert.EqualError(t, merge(&m, &m, false, "json", nil), "invalid dst kind int")
 	n := map[string]interface{}{}
-	assert.EqualError(t, merge(n, &m, false, "json"), "dst needs to be a pointer")
-	assert.EqualError(t, merge(m, &m, false, "json"), "invalid destination kind int")
-	assert.EqualError(t, merge(&n, m, false, "json"), "invalid source kind int")
+	assert.EqualError(t, merge(n, &m, false, "json", nil), "dst needs to be a pointer")
+	assert.EqualError(t, merge(m, &m, false, "json", nil), "invalid destination kind int")
+	assert.EqualError(t, merge(&n, m, false, "json", nil), "invalid source kind int")
 }
 
 func TestNumericConversion(t *testing.T) {
