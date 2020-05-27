@@ -179,6 +179,10 @@ func mergeStepStruct(dst, src reflect.Value, overwrite bool, tag string, tc Type
 					if dstval.CanSet() && dstval.Type() == srcval.Type() {
 						dstval.Set(srcval)
 					}
+				} else {
+					if dstval.CanSet() {
+						tryMergeAll(dstval, srcval, tc)
+					}
 				}
 			}
 		}

@@ -5,18 +5,19 @@ import (
 	"time"
 )
 
-func tryMergeAll(dstval reflect.Value, srcval reflect.Value, tc TypeConverters) {
+func tryMergeAll(dstval reflect.Value, srcval reflect.Value, tc TypeConverters) bool {
 	if tryMergeTimeString(dstval, srcval) {
-		return
+		return true
 	}
 	if tryMergeNumeric(dstval, srcval) {
-		return
+		return true
 	}
 	// if tc != nil {
 	if tc.TrySet(dstval, srcval) {
-		return
+		return true
 	}
 	// }
+	return false
 }
 
 func tryMergeTimeString(dstval reflect.Value, srcval reflect.Value) bool {

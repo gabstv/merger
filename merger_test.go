@@ -165,7 +165,7 @@ func TestNumericConversion(t *testing.T) {
 		}{}
 		b.A = 10
 		assert.NoError(t, MergeOverwrite(&a, &b))
-		assert.NotEqual(t, 10, a.A) // should not force conversion on struct to struct
+		assert.Equal(t, 10, a.A) // should force conversion on struct to struct
 	}
 	{
 		a := struct {
