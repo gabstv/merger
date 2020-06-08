@@ -184,6 +184,25 @@ func mergeStepStruct(dst, src reflect.Value, overwrite bool, tag string, tc Type
 						tryMergeAll(dstval, srcval, tc)
 					}
 				}
+			} else {
+				srcfield := srcType.Field(i)
+				if tt, ok := srcfield.Tag.Lookup(tag); ok {
+					parts := strings.Split(tt, ",")
+					if strings.TrimSpace(parts[0]) != "-" {
+						if dstval, ok := fieldJSONNames[strings.TrimSpace(parts[0])]; ok {
+							srcval := src.Field(i)
+							if dstval.Kind() == srcval.Kind() {
+								if dstval.CanSet() && dstval.Type() == srcval.Type() {
+									dstval.Set(srcval)
+								}
+							} else {
+								if dstval.CanSet() {
+									tryMergeAll(dstval, srcval, tc)
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 	}

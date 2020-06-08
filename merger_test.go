@@ -220,3 +220,19 @@ func TestOmitEmpty(t *testing.T) {
 		t.Error("beta is present")
 	}
 }
+
+func TestCasing(t *testing.T) {
+	a := struct {
+		ProtonID string `json:"proton_id"`
+		FinalUrl string `json:"final_url"`
+	}{}
+	b := struct {
+		ProtonId string `json:"proton_id"`
+		FinalURL string `json:"final_url"`
+	}{}
+	a.FinalUrl = "https://www.google.com/?q=golang"
+	b.ProtonId = "123456"
+	assert.NoError(t, MergeOverwriteWithTag(&b, &a, "json"))
+	assert.Equal(t, a.ProtonID, b.ProtonId)
+	assert.Equal(t, a.FinalUrl, b.FinalURL)
+}
